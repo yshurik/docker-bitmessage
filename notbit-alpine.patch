@@ -1,0 +1,113 @@
+Only in notbit: Makefile.am.user
+diff -ru notbit.orig/src/ntb-base58.h notbit/src/ntb-base58.h
+--- notbit.orig/src/ntb-base58.h	2020-11-18 09:21:49.506319749 +0100
++++ notbit/src/ntb-base58.h	2020-11-18 09:23:18.987477305 +0100
+@@ -26,6 +26,7 @@
+ 
+ #include <stdint.h>
+ #include <stdlib.h>
++#include <sys/types.h>
+ 
+ #include "ntb-util.h"
+ 
+diff -ru notbit.orig/src/ntb-base64.h notbit/src/ntb-base64.h
+--- notbit.orig/src/ntb-base64.h	2020-11-18 09:21:49.506319749 +0100
++++ notbit/src/ntb-base64.h	2020-11-18 09:26:12.909727209 +0100
+@@ -26,6 +26,7 @@
+ 
+ #include <stdlib.h>
+ #include <stdint.h>
++#include <sys/types.h>
+ 
+ #include "ntb-error.h"
+ 
+diff -ru notbit.orig/src/ntb-daemon.c notbit/src/ntb-daemon.c
+--- notbit.orig/src/ntb-daemon.c	2020-11-18 09:21:57.636424922 +0100
++++ notbit/src/ntb-daemon.c	2020-11-18 09:30:49.833309580 +0100
+@@ -347,9 +347,10 @@
+         }
+ 
+         /* Redirect standard files to /dev/null */
+-        stdin = freopen("/dev/null", "r", stdin);
+-        stdout = freopen("/dev/null", "w", stdout);
+-        stderr = freopen("/dev/null", "w", stderr);
++	//alpine:
++        //stdin = freopen("/dev/null", "r", stdin);
++        //stdout = freopen("/dev/null", "w", stdout);
++        //stderr = freopen("/dev/null", "w", stderr);
+ }
+ 
+ static void
+diff -ru notbit.orig/src/ntb-ipc.c notbit/src/ntb-ipc.c
+--- notbit.orig/src/ntb-ipc.c	2020-11-18 09:21:57.636424922 +0100
++++ notbit/src/ntb-ipc.c	2020-11-20 23:43:07.362765804 +0100
+@@ -378,8 +378,8 @@
+                 send_response(conn,
+                               email->request_id,
+                               NTB_IPC_PROTO_STATUS_INVALID_EMAIL,
+-                              "Error parsing email: %s",
+-                              error->message);
++                              "Error parsing email: %s, %s",
++                              error->message, (char *)buf);
+                 ntb_error_free(error);
+                 remove_email(email);
+         }
+diff -ru notbit.orig/src/ntb-parse-addresses.h notbit/src/ntb-parse-addresses.h
+--- notbit.orig/src/ntb-parse-addresses.h	2020-11-18 09:21:49.516319877 +0100
++++ notbit/src/ntb-parse-addresses.h	2020-11-18 09:31:36.803917206 +0100
+@@ -26,6 +26,7 @@
+ 
+ #include <stdbool.h>
+ #include <stdint.h>
++#include <sys/types.h>
+ 
+ #include "ntb-error.h"
+ #include "ntb-buffer.h"
+diff -ru notbit.orig/src/ntb-quoted-printable.h notbit/src/ntb-quoted-printable.h
+--- notbit.orig/src/ntb-quoted-printable.h	2020-11-18 09:21:49.516319877 +0100
++++ notbit/src/ntb-quoted-printable.h	2020-11-18 09:32:17.254440486 +0100
+@@ -26,6 +26,7 @@
+ 
+ #include <stdlib.h>
+ #include <stdint.h>
++#include <sys/types.h>
+ 
+ #include "ntb-error.h"
+ 
+diff -ru notbit.orig/src/ntb-smtp.c notbit/src/ntb-smtp.c
+--- notbit.orig/src/ntb-smtp.c	2020-11-18 09:21:57.636424922 +0100
++++ notbit/src/ntb-smtp.c	2020-11-21 15:24:37.621978087 +0100
+@@ -48,7 +48,7 @@
+ 
+ /* Force the user to use localhost, because there is no support 
+    for encryption or authentication. */
+-#define SMTP_ADDR "127.0.0.1"
++#define SMTP_ADDR "0.0.0.0"
+ 
+ enum smtp_command {
+         SMTP_COMMAND_HELO,
+@@ -161,6 +161,7 @@
+ 
+         if (!strncmp(buf, "DATA", 4)) {
+                 *smtp_command = SMTP_COMMAND_DATA;
++                shift_left(buf, 4);
+                 return true;
+         }
+ 
+@@ -256,7 +257,7 @@
+         *error_str = NULL;
+ 
+         convert_line_ends((char *)mail->text.data);
+-        add_bcc_to_text(mail);
++        //add_bcc_to_text(mail);
+ 
+         ntb_ipc_sockaddr_create(&sockaddr, &sockaddr_len, "smtp");
+         sockaddr_path = ((struct sockaddr_un *) sockaddr)->sun_path;
+@@ -429,7 +430,6 @@
+         switch (mail->smtp_state) {
+                 case SMTP_RECV_DATA:
+                         ntb_buffer_append(&mail->text, buf, strlen(buf));
+-
+                         if (!strncmp((char *)&mail->text.data[mail->text.length-5],
+                                      "\r\n.\r\n",
+                                      5)) {

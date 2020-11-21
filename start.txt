@@ -1,0 +1,3 @@
+docker volume create bm-data
+docker run -v bm-data:/data -d --name bm -p 8444:8444 -p 127.0.0.1:8445:2525 -p 127.0.0.1:8446:143 yshurik/bitmessage:latest
+
