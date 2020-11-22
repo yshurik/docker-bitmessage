@@ -38,6 +38,7 @@ COPY --from=build1 /bin/notbit-sendmail /bin/notbit-sendmail
 RUN ldd /bin/notbit
 
 COPY entrypoint.sh /entrypoint.sh
+COPY firstrun.sh /firstrun.sh
 
 RUN mkdir /data
 RUN mkdir /data/notbit
