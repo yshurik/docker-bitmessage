@@ -38,18 +38,23 @@ docker run -v bm-data:/data -d --name bm -p 8444:8444 -p 127.0.0.1:25:2525 -p 12
 
 Note that on Mac it can be tricky way to access the volume files directly, so you may prefer to map just exisitng folder:
 
+```bash
+docker run -v /Users/anonymous/bm-data:/data -d --name bm -p 8444:8444 -p 127.0.0.1:25:2525 -p 127.0.0.1:143:143 yshurik/bitmessage:latest
+```
 
 
-From example above you can setup the Thunderbird to use IMAP from localhost, port 143, user: bm, password: bm.
-For sending use SMTP localhost port 25 (no auth and credential)
+From example above you can setup the Thunderbird to use IMAP from `localhost`, port `143`, user: `bm`, password: `bm`.
+For sending use SMTP `localhost` port `25` (no auth and credential)
 
-Not that in example above port 25,143 are mapped to 127.0.0.1 only so IMAP and SMTP can be accessed only from local machine.
+Not that in example above port `25`,`143` are mapped to `127.0.0.1` only so IMAP and SMTP can be accessed only from local machine.
 
-Port 8444 (bitmessage) is mapped to all interfaces to make network connectivity with other peers.
+Port `8444` (bitmessage) is mapped to all interfaces to make network connectivity with other peers.
 
 # Creating an address
 
-TDOD: generate initial address by first start
+On first run (so no keys.dat file `<docker volume>/notbit/keys.dat`) the initialization script will create your first 
+personal address and send welcome email from yourself so you identify your `From` address for further use in emails
+as sender - appropriate key will be used from keys.dat.
 
 # Importing addresses
 
