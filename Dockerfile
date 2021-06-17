@@ -49,7 +49,7 @@ EXPOSE 8444 2525 143
 
 RUN apk --no-cache add dovecot
 COPY dovecot.conf /etc/dovecot/dovecot.conf
-RUN adduser -D bm
+RUN adduser -D bm --shell=/sbin/nologin
 RUN echo bm:bm | chpasswd 
 RUN cd /home/bm && ln -s /data/maildir
 RUN chown -R -c bm:bm /data
@@ -58,5 +58,6 @@ VOLUME ["/data"]
 RUN ls -al /data
 WORKDIR /data
 
+USER bm
 ENTRYPOINT ["/entrypoint.sh"]
 
