@@ -1,0 +1,28 @@
+#
+# Start up a bitmessage server using docker-compose
+#
+# To run this in the background use: docker-compose up -d
+#
+# Author: Tim Molteno tim@molteno.net
+#
+
+version: "3.7"
+
+services:
+    bm:
+        build: 
+            context: .
+        restart: unless-stopped
+        volumes:
+            - bm-data:/data
+        ports:
+            - 8444:8444
+            - 127.0.0.1:25:2525
+            - 127.0.0.1:143:143
+        logging:
+            driver: "json-file"
+            options:
+                max-file: "5"
+                max-size: "1m"
+volumes:
+    bm-data:
