@@ -22,6 +22,21 @@ I am not a cryptography expert and I don't know whether Notbit or the
 Bitmessage protocol is actually safe for secure communications. I
 wouldn't recommend using for anything highly sensitive.
 
+# Download the software
+
+There is a choice of Intel or Arm architecture. The Arm version is built and tested on Raspberry Pi system.
+
+PC: linux/amd64:
+```bash
+docker pull yshurik/bitmessage:latest_x86
+```
+
+Raspberry Pi: linux/arm:
+```bash
+docker pull yshurik/bitmessage:latest_arm
+```
+
+
 # Running bitmessage docker container
 
 First you may want to have dedicated docker volume for bitmessage data (keys etc):
