@@ -1,4 +1,4 @@
-FROM alpine:3.8 as build1
+FROM alpine:3.9 as build1
 
 RUN apk --no-cache add gcc
 RUN apk --no-cache add g++
@@ -11,8 +11,10 @@ RUN apk --no-cache add autoconf automake make
 RUN cd /usr/lib && ln -s libboost_thread-mt.so libboost_thread.so
 
 WORKDIR /
-RUN echo trigger2
+RUN echo trigger5
 RUN git clone https://github.com/yshurik/notbit.git
+#COPY notbit /notbit
+
 WORKDIR /notbit
 RUN git checkout smtp
 RUN ./autogen.sh --prefix=/ # || cat config.log
@@ -22,13 +24,14 @@ COPY notbit-alpine.patch /1.patch
 RUN patch -p0 < 1.patch
 
 WORKDIR /notbit
+#RUN make clean
 RUN make
 RUN make install
 
 RUN notbit -h || echo ok
 RUN ldd /bin/notbit
 
-FROM alpine:3.8 as notbit1
+FROM alpine:3.9 as notbit1
 
 RUN apk --no-cache add zlib
 RUN apk --no-cache add openssl
@@ -47,10 +50,11 @@ RUN mkdir /data/maildir
 
 EXPOSE 8444 2525 143
 
+RUN apk --no-cache add bash
 RUN apk --no-cache add dovecot
 COPY dovecot.conf /etc/dovecot/dovecot.conf
 RUN adduser -D bm
-RUN echo bm:bm | chpasswd 
+RUN echo bm:bm | chpasswd
 RUN cd /home/bm && ln -s /data/maildir
 RUN chown -R -c bm:bm /data
 RUN ls -al /data
