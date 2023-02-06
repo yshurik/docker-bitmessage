@@ -11,7 +11,7 @@ RUN apk --no-cache add autoconf automake make
 RUN cd /usr/lib && ln -s libboost_thread-mt.so libboost_thread.so
 
 WORKDIR /
-RUN echo trigger5
+RUN echo trigger6
 RUN git clone https://github.com/yshurik/notbit.git
 #COPY notbit /notbit
 
